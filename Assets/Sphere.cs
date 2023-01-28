@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 
-public class Sphere : MonoBehaviour, IMoveable
+public class Sphere : MonoBehaviour, IPlayable
 {
     [SerializeField] private DistanceTraveledText distanceText;
     [SerializeField] private ParticleSystem explosionParticles;
@@ -22,7 +23,7 @@ public class Sphere : MonoBehaviour, IMoveable
     {
         this.transform.position = new Vector3(radius, this.transform.position.y, this.transform.position.z);
         updateAction = NullAction;
-        var moveCommandPublisher = new MoveCommandPublisher();
+        var moveCommandPublisher = new PlayCommandPublisher();
         moveCommandPublisher.Subscribe(this);
         distanceText.ClearText();
     }
@@ -32,7 +33,7 @@ public class Sphere : MonoBehaviour, IMoveable
         updateAction.Invoke();
     }
 
-    public void Move()
+    public void Play()
     {
         updateAction = MoveAction;
         distanceText.ClearText();
@@ -53,13 +54,14 @@ public class Sphere : MonoBehaviour, IMoveable
 
     private void MoveAction()
     {
-        angle += (SetSpeed() / (radius * Mathf.PI * 2)) * Time.deltaTime;
+        var speedParticle =  GetSpeedParticle();
+        angle += (SetSpeed(speedParticle) / (radius * Mathf.PI * 2)) * Time.deltaTime;
         float x = Mathf.Cos(angle) * radius;
         float z = Mathf.Sin(angle) * radius;
         var newPosition = new Vector3(x, transform.position.y, z);
         CountDistance(transform.position, newPosition);
         transform.position = newPosition;
-        radius -= Time.deltaTime;
+        radius -= Time.deltaTime * speedParticle;
         CheckIfSphereAchievedCenter();
     }
 
@@ -74,11 +76,18 @@ public class Sphere : MonoBehaviour, IMoveable
     {
         if (newScale <= 0)
         {
-            var explosion = Instantiate(explosionParticles);
-            explosion.Play();
-            Destroy(this.gameObject,0.1f);
             updateAction = NullAction;
+            InstanceExplosion();
+            Destroy(this.gameObject);
         }
+    }
+
+    private void InstanceExplosion()
+    {
+        var explosion = Instantiate(explosionParticles);
+        explosion.transform.position = this.transform.position;
+        explosion.Play();
+        Destroy(explosion.gameObject, 10);
     }
 
     private void CountDistance(Vector3 previousPosition, Vector3 newPosition)
@@ -95,16 +104,15 @@ public class Sphere : MonoBehaviour, IMoveable
         }
     }
 
-    private float SetSpeed()
+    private float SetSpeed(float speedParticle)
+    {
+        return maxSpeed * speedParticle * speedMultiplier;
+    }
+
+    private float GetSpeedParticle()
     {
         accelerationTime += Time.deltaTime;
         var a = accelerationCurve.Evaluate(accelerationTime / timeOfAcclerationIncrease);
-        return maxSpeed * a * speedMultiplier;
+        return a;
     }
-}
-
-public interface IMoveable
-{
-    void Move();
-    void Stop();
 }

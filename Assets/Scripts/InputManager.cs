@@ -4,11 +4,11 @@ using UnityEngine;
 public class InputManager : MonoBehaviour
 {
     [SerializeField] private float timeOfBreak = 5;
-    private MoveCommandPublisher moveCommandPublisher;
+    private PlayCommandPublisher _playCommandPublisher;
     private bool canStopMove = true;
     void Awake()
     {
-        moveCommandPublisher = new MoveCommandPublisher();
+        _playCommandPublisher = new PlayCommandPublisher();
     }
     private void Update()
     {
@@ -22,16 +22,16 @@ public class InputManager : MonoBehaviour
     {
         if (canStopMove)
         {
-            StartCoroutine(StopMovementCoroutine(timeOfBreak));
+              StartCoroutine(StopMovementCoroutine(timeOfBreak));
         }
     }
 
     IEnumerator StopMovementCoroutine(float timeOfBreak)
     {
         canStopMove = false;
-        moveCommandPublisher.StopSubscribers();
+        _playCommandPublisher.StopSubscribers();
         yield return new WaitForSeconds(timeOfBreak);
-        moveCommandPublisher.MoveSubscribers();
+        _playCommandPublisher.PlaySubscribers();
         canStopMove = true;
     }
 }
