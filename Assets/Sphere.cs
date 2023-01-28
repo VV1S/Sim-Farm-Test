@@ -6,10 +6,12 @@ using UnityEngine;
 public class Sphere : MonoBehaviour, IMoveable
 {
     [SerializeField] private DistanceTraveledText distanceText;
+    [SerializeField] private ParticleSystem explosionParticles;
     [SerializeField] private float maxSpeed = 5f;
     [Range(0,float.MaxValue)][SerializeField] private float radius = 4f;
     [SerializeField] private AnimationCurve accelerationCurve;
     [SerializeField] private float timeOfAcclerationIncrease = 5f;
+    [SerializeField] private float shrinkingModifier = 2;
     private float speedMultiplier = 10;
     private float angle = 0;
     private float accelerationTime = 0;
@@ -61,6 +63,24 @@ public class Sphere : MonoBehaviour, IMoveable
         CheckIfSphereAchievedCenter();
     }
 
+    private void ShrinkAction()
+    {
+        var newScale = transform.localScale.x - Time.deltaTime * shrinkingModifier;
+        transform.localScale = new Vector3(newScale, newScale, newScale);
+        CheckIfNewScaleAchievedZero(newScale);
+    }
+
+    private void CheckIfNewScaleAchievedZero(float newScale)
+    {
+        if (newScale <= 0)
+        {
+            var explosion = Instantiate(explosionParticles);
+            explosion.Play();
+            Destroy(this.gameObject,0.1f);
+            updateAction = NullAction;
+        }
+    }
+
     private void CountDistance(Vector3 previousPosition, Vector3 newPosition)
     {
         distance += Vector3.Distance(previousPosition, newPosition);
@@ -70,9 +90,8 @@ public class Sphere : MonoBehaviour, IMoveable
     {
         if (Mathf.Abs(radius) < Time.deltaTime)
         {
-            Debug.Log("Center reached!");
-            Stop();
             transform.position = new Vector3(0, transform.position.y, 0);
+            updateAction = ShrinkAction;
         }
     }
 
