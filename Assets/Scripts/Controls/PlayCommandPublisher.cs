@@ -11,6 +11,11 @@ namespace Controls
             subscribers.Add(playable);
         }
 
+        public void UnsubscribeAll()
+        {
+            subscribers.Clear();
+        }
+
         public void PlaySubscribers()
         {
             foreach (var playable in subscribers)

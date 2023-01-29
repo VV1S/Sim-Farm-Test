@@ -8,6 +8,7 @@ namespace Sphere
     {
         [SerializeField] private Color32 myColor;
         [SerializeField] Material myMaterial;
+
         private byte r, g, b, a = 255;
         private int multiplier = 100;
         private int moduloDivider = 255;

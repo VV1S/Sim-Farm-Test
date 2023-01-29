@@ -1,4 +1,5 @@
 using System;
+using Controls;
 using UnityEngine;
 using static Core.Globals;
 
@@ -14,20 +15,20 @@ namespace Sphere
         [SerializeField] private AnimationCurve accelerationCurve;
         [SerializeField] private float timeOfAcclerationIncrease = 5f;
         [SerializeField] private float shrinkingModifier = 2;
+
         public float distance { get; private set; } = 0;
-        private bool endPositionAchieved = false;
-        private bool started = false;
         private float speedMultiplier = 10;
         private float angle = 0;
         private float accelerationTime = 0;
         private Action updateAction;
+        private PlayCommandPublisher _playCommandPublisher;
 
         void Start()
         {
             this.transform.position = new Vector3(radius + endPoint.x, this.transform.position.y, this.transform.position.z + endPoint.y);
             updateAction = NullAction;
-            var moveCommandPublisher = new Controls.PlayCommandPublisher();
-            moveCommandPublisher.Subscribe(this);
+            _playCommandPublisher = new Controls.PlayCommandPublisher();
+            _playCommandPublisher.Subscribe(this);
             distanceText.ClearText();
         }
 
@@ -38,19 +39,15 @@ namespace Sphere
 
         public void Play()
         {
-            if (endPositionAchieved || started) return;
             updateAction = Move;
             distanceText.ClearText();
-            UpdateStartedCondition();
         }
 
         public void Stop()
         {
-            if (!started) return;
             updateAction = NullAction;
             distanceText.UpdateText(distance);
             ResetAccelerationTime();
-            UpdateStartedCondition();
         }
 
         private void Move()
@@ -68,11 +65,6 @@ namespace Sphere
             var newScale = transform.localScale.x - Time.deltaTime * shrinkingModifier;
             transform.localScale = new Vector3(newScale, newScale, newScale);
             CheckIfNewScaleAchievedZero(newScale);
-        }
-
-        private void UpdateStartedCondition()
-        {
-            started = !started;
         }
 
         private void ResetAccelerationTime()
@@ -127,8 +119,8 @@ namespace Sphere
             if (Mathf.Abs(radius) < Time.deltaTime)
             {
                 transform.position = new Vector3(endPoint.x, transform.position.y, endPoint.y);
-                endPositionAchieved = true;
                 updateAction = Shrink;
+                _playCommandPublisher.UnsubscribeAll();
             }
         }
 
