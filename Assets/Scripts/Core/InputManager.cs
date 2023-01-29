@@ -1,31 +1,38 @@
+using System;
 using System.Collections;
 using UnityEngine;
+using static Core.Globals;
 
 namespace Core
 {
     public class InputManager : MonoBehaviour
     {
         [SerializeField] private float timeOfBreak = 5;
+        [SerializeField] private bool canStopMove = true;
+
         private Controls.PlayCommandPublisher _playCommandPublisher;
-        [SerializeField] private bool canStopMove = false;
-        private bool allowGetingKeys = false;
+        private Action updateAction;
         void Awake()
         {
             _playCommandPublisher = new Controls.PlayCommandPublisher();
+            updateAction = NullAction;
         }
         private void Update()
+        {
+            updateAction.Invoke();
+        }
+
+        public void AllowGettingKeys()
+        {
+            updateAction = GetInput;
+        }
+
+        private void GetInput()
         {
             if (canStopMove && Input.GetKeyDown(KeyCode.Space))
             {
                 StopForFiveSeconds(timeOfBreak);
             }
-        }
-
-        public void AllowGetingKeys()
-        {
-            if (allowGetingKeys) return;
-            allowGetingKeys = true;
-            canStopMove = true;
         }
 
         private void StopForFiveSeconds(float timeOfBreak)

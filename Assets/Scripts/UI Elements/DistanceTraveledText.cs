@@ -10,7 +10,7 @@ namespace UiElements
 
         public void UpdateText(float distance)
         {
-            displayText.text = "DISTANCE TRAVELED: " + String.Format("{0:0}", distance);
+            displayText.text = "DISTANCE TRAVELED: " + String.Format("{0:0.0}", distance);
         }
 
         public void ClearText()
