@@ -53,11 +53,6 @@ namespace Sphere
             UpdateStartedCondition();
         }
 
-        private void UpdateStartedCondition()
-        {
-            started = !started;
-        }
-
         private void Move()
         {
             var speedFraction = GetSpeedFraction();
@@ -73,6 +68,11 @@ namespace Sphere
             var newScale = transform.localScale.x - Time.deltaTime * shrinkingModifier;
             transform.localScale = new Vector3(newScale, newScale, newScale);
             CheckIfNewScaleAchievedZero(newScale);
+        }
+
+        private void UpdateStartedCondition()
+        {
+            started = !started;
         }
 
         private void ResetAccelerationTime()

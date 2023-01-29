@@ -517,8 +517,8 @@ GameObject:
   - component: {fileID: 777214342}
   - component: {fileID: 777214341}
   - component: {fileID: 777214340}
-  - component: {fileID: 777214344}
   - component: {fileID: 777214345}
+  - component: {fileID: 777214344}
   - component: {fileID: 777214346}
   m_Layer: 0
   m_Name: Sphere
@@ -1044,7 +1044,7 @@ GameObject:
   - component: {fileID: 1304671398}
   - component: {fileID: 1304671397}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
