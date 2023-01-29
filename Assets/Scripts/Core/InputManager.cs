@@ -7,25 +7,30 @@ namespace Core
     {
         [SerializeField] private float timeOfBreak = 5;
         private Controls.PlayCommandPublisher _playCommandPublisher;
-        private bool canStopMove = true;
+        [SerializeField] private bool canStopMove = false;
+        private bool allowGetingKeys = false;
         void Awake()
         {
             _playCommandPublisher = new Controls.PlayCommandPublisher();
         }
         private void Update()
         {
-            if (Input.GetKeyUp(KeyCode.Space))
+            if (canStopMove && Input.GetKeyDown(KeyCode.Space))
             {
                 StopForFiveSeconds(timeOfBreak);
             }
         }
 
+        public void AllowGetingKeys()
+        {
+            if (allowGetingKeys) return;
+            allowGetingKeys = true;
+            canStopMove = true;
+        }
+
         private void StopForFiveSeconds(float timeOfBreak)
         {
-            if (canStopMove)
-            {
-                StartCoroutine(StopMovementCoroutine(timeOfBreak));
-            }
+            StartCoroutine(StopMovementCoroutine(timeOfBreak));
         }
 
         IEnumerator StopMovementCoroutine(float timeOfBreak)
