@@ -17,21 +17,19 @@ namespace Sphere
         [SerializeField] private float timeOfAcclerationIncrease = 5f;
         [SerializeField] private float shrinkingModifier = 2;
 
-        public float distance { get; private set; } = 0;
+        private float distance = 0;
         private float speedMultiplier = 10;
         private float angle = 0;
         private float accelerationTime = 0;
         private Action updateAction;
         private PlayCommandPublisher _playCommandPublisher;
-        public GameObject GameObject { get; set; }
 
         void Start()
         {
-            GameObject = this.gameObject;
             this.transform.position = new Vector3(radius + endPoint.x, this.transform.position.y, this.transform.position.z + endPoint.y);
             updateAction = NullAction;
             _playCommandPublisher = new Controls.PlayCommandPublisher();
-            _playCommandPublisher.Subscribe(this);
+            _playCommandPublisher.Subscribe(this.gameObject.GetInstanceID(), this);
             distanceText.ClearText();
         }
 

@@ -15,14 +15,12 @@ namespace Sphere
         private int moduloDivider = 255;
         private Action changeColorAction;
         private bool started = false;
-        public GameObject GameObject { get; set; }
 
         void Start()
         {
-            GameObject = this.gameObject;
             changeColorAction = NullAction;
             var moveCommandPublisher = new Controls.PlayCommandPublisher();
-            moveCommandPublisher.Subscribe(this);
+            moveCommandPublisher.Subscribe(this.gameObject.GetInstanceID(), this);
             UpdateColor();
         }
 

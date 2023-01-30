@@ -6,12 +6,12 @@ namespace Controls
     {
         private static Dictionary<int, List<IPlayable>> newSubscribers = new Dictionary<int , List<IPlayable>>();
 
-        public void Subscribe(IPlayable playable)
+        public void Subscribe(int id, IPlayable playable)
         {
-            if (newSubscribers.ContainsKey(playable.GameObject.GetInstanceID()))
-                newSubscribers[playable.GameObject.GetInstanceID()].Add(playable);
+            if (newSubscribers.ContainsKey(id))
+                newSubscribers[id].Add(playable);
             else
-                newSubscribers.Add(playable.GameObject.GetInstanceID(), new List<IPlayable>(){playable});
+                newSubscribers.Add(id, new List<IPlayable>(){playable});
         }
 
         public void Unsubscribe(int id)
