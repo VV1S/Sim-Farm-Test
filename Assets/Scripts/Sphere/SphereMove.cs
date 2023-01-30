@@ -22,15 +22,17 @@ namespace Sphere
         private float angle = 0;
         private float accelerationTime = 0;
         private Action updateAction;
-        private PlayCommandPublisher _playCommandPublisher;
+        private Func<float> maxSpeedFraction;
+        private PlayCommandPublisher playCommandPublisher;
 
         void Start()
         {
             this.transform.position = new Vector3(radius + endPoint.x, this.transform.position.y, this.transform.position.z + endPoint.y);
             updateAction = NullAction;
-            _playCommandPublisher = new Controls.PlayCommandPublisher();
-            _playCommandPublisher.Subscribe(this.gameObject.GetInstanceID(), this);
-            distanceText.ClearText();
+            playCommandPublisher = new Controls.PlayCommandPublisher();
+            playCommandPublisher.Subscribe(this.gameObject.GetInstanceID(), this);
+            ClearDistanceText();
+            DefineMaxSpeedFraction();
         }
 
         void Update()
@@ -41,19 +43,19 @@ namespace Sphere
         public void Play()
         {
             updateAction = Move;
-            distanceText.ClearText();
+            ClearDistanceText();
         }
 
         public void Stop()
         {
             updateAction = NullAction;
-            distanceText.UpdateText(distance);
+            UpdateDistanceText();
             ResetAccelerationTime();
         }
 
         private void Move()
         {
-            var speedFraction = GetSpeedFraction();
+            var speedFraction = maxSpeedFraction.Invoke();
             var newPosition = GetNewPosition(speedFraction);
             CountDistance(transform.position, newPosition);
             transform.position = newPosition;
@@ -104,6 +106,7 @@ namespace Sphere
 
         private void InstanceExplosion()
         {
+            if (explosionParticles == null) return;
             var explosion = Instantiate(explosionParticles);
             explosion.transform.position = this.transform.position;
             explosion.Play();
@@ -121,7 +124,7 @@ namespace Sphere
             {
                 transform.position = new Vector3(endPoint.x, transform.position.y, endPoint.y);
                 updateAction = Shrink;
-                _playCommandPublisher.Unsubscribe(this.gameObject.GetInstanceID());
+                playCommandPublisher.Unsubscribe(this.gameObject.GetInstanceID());
             }
         }
 
@@ -135,6 +138,31 @@ namespace Sphere
             accelerationTime += Time.deltaTime;
             var speedFraction = accelerationCurve.Evaluate(accelerationTime / timeOfAcclerationIncrease);
             return speedFraction;
+        }
+
+        private void UpdateDistanceText()
+        {
+            if (distanceText == null) return;
+            distanceText.UpdateText(distance);
+        }
+
+        private void ClearDistanceText()
+        {
+            if (distanceText == null) return;
+            distanceText.ClearText();
+        }
+
+        private void DefineMaxSpeedFraction()
+        {
+            if (accelerationCurve == null)
+                maxSpeedFraction = ReturnOne;
+            else
+                maxSpeedFraction = GetSpeedFraction;
+        }
+
+        private float ReturnOne()
+        {
+            return 1;
         }
     }
 }

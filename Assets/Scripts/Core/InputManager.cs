@@ -9,12 +9,12 @@ namespace Core
     {
         [SerializeField] private float timeOfBreak = 5;
 
-        private Controls.PlayCommandPublisher _playCommandPublisher;
+        private Controls.PlayCommandPublisher playCommandPublisher;
         private Action updateAction;
         private Action activateInputManagerAction;
         void Awake()
         {
-            _playCommandPublisher = new Controls.PlayCommandPublisher();
+            playCommandPublisher = new Controls.PlayCommandPublisher();
             updateAction = NullAction;
             activateInputManagerAction = ActivateInputManager;
         }
@@ -32,7 +32,7 @@ namespace Core
         {
             activateInputManagerAction = NullAction;
             updateAction = GetInput;
-            _playCommandPublisher.PlaySubscribers();
+            playCommandPublisher.PlaySubscribers();
         }
 
         private void GetInput()
@@ -51,9 +51,9 @@ namespace Core
         IEnumerator StopMovementCoroutine(float timeOfBreak)
         {
             updateAction = NullAction;
-            _playCommandPublisher.StopSubscribers();
+            playCommandPublisher.StopSubscribers();
             yield return new WaitForSeconds(timeOfBreak);
-            _playCommandPublisher.PlaySubscribers();
+            playCommandPublisher.PlaySubscribers();
             updateAction = GetInput;
         }
     }

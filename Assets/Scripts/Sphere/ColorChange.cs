@@ -7,8 +7,7 @@ namespace Sphere
 {
     public class ColorChange : MonoBehaviour, IPlayable
     {
-        [SerializeField] private Color32 myColor;
-        [SerializeField] Material myMaterial;
+        public Material myMaterial;
 
         private byte r, g, b, a = 255;
         private int multiplier = 100;
@@ -53,8 +52,7 @@ namespace Sphere
             r = (byte)((transform.position.x * multiplier) % moduloDivider);
             g = (byte)((transform.position.z * multiplier) % moduloDivider);
             b = (byte)(((transform.position.x + transform.position.z) * multiplier) % moduloDivider);
-            myColor = new Color32(r, g, b, a);
-            myMaterial.color = myColor;
+            myMaterial.color = new Color32(r, g, b, a);
         }
     }
 }
