@@ -4,31 +4,40 @@ namespace Controls
 {
     public class PlayCommandPublisher
     {
-        private static List<IPlayable> subscribers = new List<IPlayable>();
+        private static Dictionary<int, List<IPlayable>> newSubscribers = new Dictionary<int , List<IPlayable>>();
 
         public void Subscribe(IPlayable playable)
         {
-            subscribers.Add(playable);
+            if (newSubscribers.ContainsKey(playable.GameObject.GetInstanceID()))
+                newSubscribers[playable.GameObject.GetInstanceID()].Add(playable);
+            else
+                newSubscribers.Add(playable.GameObject.GetInstanceID(), new List<IPlayable>(){playable});
         }
 
-        public void UnsubscribeAll()
+        public void Unsubscribe(int id)
         {
-            subscribers.Clear();
+            newSubscribers.Remove(id);
         }
 
         public void PlaySubscribers()
         {
-            foreach (var playable in subscribers)
+            foreach (var playables in newSubscribers.Values)
             {
-                playable.Play();
+                foreach (var playable in playables)
+                {
+                    playable.Play();
+                }
             }
         }
 
         public void StopSubscribers()
         {
-            foreach (var playable in subscribers)
+            foreach (var playables in newSubscribers.Values)
             {
-                playable.Stop();
+                foreach (var playable in playables)
+                {
+                    playable.Stop();
+                }
             }
         }
     }

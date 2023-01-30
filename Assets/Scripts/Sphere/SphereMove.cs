@@ -1,5 +1,6 @@
 using System;
 using Controls;
+using Unity.VisualScripting;
 using UnityEngine;
 using static Core.Globals;
 
@@ -22,9 +23,11 @@ namespace Sphere
         private float accelerationTime = 0;
         private Action updateAction;
         private PlayCommandPublisher _playCommandPublisher;
+        public GameObject GameObject { get; set; }
 
         void Start()
         {
+            GameObject = this.gameObject;
             this.transform.position = new Vector3(radius + endPoint.x, this.transform.position.y, this.transform.position.z + endPoint.y);
             updateAction = NullAction;
             _playCommandPublisher = new Controls.PlayCommandPublisher();
@@ -120,7 +123,7 @@ namespace Sphere
             {
                 transform.position = new Vector3(endPoint.x, transform.position.y, endPoint.y);
                 updateAction = Shrink;
-                _playCommandPublisher.UnsubscribeAll();
+                _playCommandPublisher.Unsubscribe(this.gameObject.GetInstanceID());
             }
         }
 
