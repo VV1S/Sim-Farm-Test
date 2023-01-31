@@ -24,12 +24,14 @@ namespace Sphere
         private Action updateAction;
         private Func<float> maxSpeedFraction;
         private PlayCommandPublisher playCommandPublisher;
+        private ParticleEffectFactory particleEffectFactory;
 
         void Start()
         {
+            playCommandPublisher = new Controls.PlayCommandPublisher();
+            particleEffectFactory = new ParticleEffectFactory();
             this.transform.position = new Vector3(radius + endPoint.x, this.transform.position.y, this.transform.position.z + endPoint.y);
             updateAction = NullAction;
-            playCommandPublisher = new Controls.PlayCommandPublisher();
             playCommandPublisher.Subscribe(this.gameObject.GetInstanceID(), this);
             ClearDistanceText();
             DefineMaxSpeedFraction();
@@ -104,15 +106,6 @@ namespace Sphere
             }
         }
 
-        private void InstanceExplosion()
-        {
-            if (explosionParticles == null) return;
-            var explosion = Instantiate(explosionParticles);
-            explosion.transform.position = this.transform.position;
-            explosion.Play();
-            Destroy(explosion.gameObject, 10);
-        }
-
         private void CountDistance(Vector3 previousPosition, Vector3 newPosition)
         {
             distance += Vector3.Distance(previousPosition, newPosition);
@@ -163,6 +156,14 @@ namespace Sphere
         private float ReturnOne()
         {
             return 1;
+        }
+
+        private void InstanceExplosion()
+        {
+            if (explosionParticles == null) return;
+            var explosion = particleEffectFactory.Create(explosionParticles, this.transform.position);
+            explosion.Play();
+            Destroy(explosion.gameObject, 10);
         }
     }
 }
